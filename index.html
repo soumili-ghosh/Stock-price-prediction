@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Price Prediction</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background: linear-gradient(135deg, #3a1c71, #1f2e68, #36302d); 
+            color: #f4f4f9;
+        }
+        .container { 
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(10px); 
+            padding: 30px; 
+            border-radius: 20px; 
+            width: 780px; 
+            margin: 50px auto; 
+            box-shadow: 0px 8px 25px rgba(0,0,0,0.4); 
+        }
+        h2 { 
+            text-align: center; 
+            color: #ffffff; 
+            margin-bottom: 20px; 
+            font-size: 30px; 
+            letter-spacing: 1px;
+            text-shadow: 0px 0px 12px rgba(255,255,255,0.5);
+        }
+        h3 { 
+            color: #ffe6ff; 
+            border-left: 5px solid #ffdd59; 
+            padding-left: 12px; 
+            margin-top: 30px; 
+        }
+        table { 
+            width: 100%; 
+            margin-top: 15px; 
+            border-collapse: collapse; 
+            font-size: 15px; 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td { 
+            padding: 12px; 
+            border: 1px solid rgba(255,255,255,0.2); 
+            text-align: center; 
+            color: #fff;
+        }
+        th { 
+            background: rgba(0,0,0,0.4); 
+            font-weight: 600; 
+        }
+        tr:nth-child(even) { 
+            background: rgba(255,255,255,0.1); 
+        }
+        tr:hover { 
+            background: rgba(255,255,255,0.2); 
+        }
+        .form-box { 
+            margin-bottom: 25px; 
+            text-align: center; 
+            padding: 20px; 
+            background: rgba(0,0,0,0.4); 
+            border-radius: 12px; 
+        }
+        label { 
+            font-weight: 600; 
+            margin-right: 8px; 
+            color: #fff; 
+        }
+        select, input[type="date"] { 
+            padding: 10px; 
+            margin: 8px; 
+            border: none; 
+            border-radius: 6px; 
+            background: rgba(255,255,255,0.2); 
+            color: #fff; 
+            width: 170px; 
+            outline: none;
+        }
+        select option { background: #3a1c71; color: white; }
+        button { 
+            padding: 12px 24px; 
+            background: linear-gradient(135deg, #6a11cb, #2575fc); 
+            color: white; 
+            font-size: 16px; 
+            font-weight: 600; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: 0.3s ease; 
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+        }
+        button:hover { 
+            background: linear-gradient(135deg, #2575fc, #6a11cb); 
+            transform: scale(1.05); 
+            box-shadow: 0px 10px 20px rgba(0,0,0,0.5);
+        }
+        p { 
+            font-size: 15px; 
+            color: #fff; 
+        }
+        b { 
+            color: #ffdd59; 
+        }
+        #chartContainer { 
+            margin-top: 25px; 
+            display: none; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>💹 Stock Price Prediction Dashboard</h2>
+
+        <div class="form-box">
+            <form method="POST">
+                <label for="ticker">Stock Symbol:</label>
+                <select name="ticker" id="ticker" class="form-control">
+                    <optgroup label="US Tech Giants">
+                        <option value="AAPL" {% if ticker == "AAPL" %}selected{% endif %}>Apple (AAPL)</option>
+                        <option value="MSFT" {% if ticker == "MSFT" %}selected{% endif %}>Microsoft (MSFT)</option>
+                        <option value="GOOGL" {% if ticker == "GOOGL" %}selected{% endif %}>Google (GOOGL)</option>
+                        <option value="AMZN" {% if ticker == "AMZN" %}selected{% endif %}>Amazon (AMZN)</option>
+                        <option value="TSLA" {% if ticker == "TSLA" %}selected{% endif %}>Tesla (TSLA)</option>
+                        <option value="META" {% if ticker == "META" %}selected{% endif %}>Meta (META)</option>
+                        <option value="NFLX" {% if ticker == "NFLX" %}selected{% endif %}>Netflix (NFLX)</option>
+                        <option value="NVDA" {% if ticker == "NVDA" %}selected{% endif %}>NVIDIA (NVDA)</option>
+                    </optgroup>
+                    <optgroup label="US Blue Chips">
+                        <option value="JPM" {% if ticker == "JPM" %}selected{% endif %}>JPMorgan Chase (JPM)</option>
+                        <option value="BAC" {% if ticker == "BAC" %}selected{% endif %}>Bank of America (BAC)</option>
+                        <option value="GS" {% if ticker == "GS" %}selected{% endif %}>Goldman Sachs (GS)</option>
+                        <option value="DIS" {% if ticker == "DIS" %}selected{% endif %}>Disney (DIS)</option>
+                        <option value="KO" {% if ticker == "KO" %}selected{% endif %}>Coca-Cola (KO)</option>
+                        <option value="PEP" {% if ticker == "PEP" %}selected{% endif %}>PepsiCo (PEP)</option>
+                        <option value="MCD" {% if ticker == "MCD" %}selected{% endif %}>McDonald's (MCD)</option>
+                        <option value="WMT" {% if ticker == "WMT" %}selected{% endif %}>Walmart (WMT)</option>
+                    </optgroup>
+                    <optgroup label="UK Stocks">
+                        <option value="VOD.L" {% if ticker == "VOD.L" %}selected{% endif %}>Vodafone Group (VOD.L)</option>
+                        <option value="HSBA.L" {% if ticker == "HSBA.L" %}selected{% endif %}>HSBC Holdings (HSBA.L)</option>
+                        <option value="BP.L" {% if ticker == "BP.L" %}selected{% endif %}>BP Plc (BP.L)</option>
+                        <option value="ULVR.L" {% if ticker == "ULVR.L" %}selected{% endif %}>Unilever (ULVR.L)</option>
+                    </optgroup>
+                    <optgroup label="Indian Stocks (NSE)">
+                        <option value="RELIANCE.NS" {% if ticker == "RELIANCE.NS" %}selected{% endif %}>Reliance Industries (RELIANCE.NS)</option>
+                        <option value="TCS.NS" {% if ticker == "TCS.NS" %}selected{% endif %}>Tata Consultancy Services (TCS.NS)</option>
+                        <option value="INFY.NS" {% if ticker == "INFY.NS" %}selected{% endif %}>Infosys (INFY.NS)</option>
+                        <option value="WIPRO.NS" {% if ticker == "WIPRO.NS" %}selected{% endif %}>Wipro (WIPRO.NS)</option>
+                    </optgroup>
+                </select>
+
+                <label>Forecast Date:</label>
+                <input type="date" name="forecast_date" value="{{ predictions.forecast_date }}" required>
+                <button type="submit">🔮 Predict</button>
+            </form>
+        </div>
+
+        <h3>Last Known Price</h3>
+        <p><b style="font-size: 20px;">On {{ predictions.last_date }}</b>: <b style="font-size: 20px;">{{ predictions.last_price }}</b></p>
+
+        <table>
+            <tr><th>Model</th><th>Predicted Price</th></tr>
+            <tr><td>Linear Regression</td><td>{{ predictions['Linear Regression'] }}</td></tr>
+            <tr><td>Random Forest</td><td>{{ predictions['Random Forest'] }}</td></tr>
+            <tr><td>Decision Tree</td><td>{{ predictions['Decision Tree'] }}</td></tr>
+            <tr><td>ARIMA</td><td>{{ predictions['ARIMA'] }}</td></tr>
+        </table>
+
+        <h3>Model Performance (R² Score)</h3>
+        <table>
+            <tr><th>Model</th><th>R² Score</th></tr>
+            {% for model, score in performance.items() %}
+            <tr><td>{{ model }}</td><td>{{ score|round(4) }}</td></tr>
+            {% endfor %}
+        </table>
+
+        <div style="text-align:center; margin-top:20px;">
+            <button onclick="showChart()">📊 Show Visualization</button>
+        </div>
+
+        <div id="chartContainer">
+            <canvas id="predictionChart" width="700" height="400"></canvas>
+        </div>
+    </div>
+
+    <script>
+        function showChart() {
+            document.getElementById("chartContainer").style.display = "block";
+    
+            const ctx = document.getElementById('predictionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Linear Regression', 'Random Forest', 'Decision Tree', 'ARIMA'],
+                    datasets: [{
+                        label: 'Predicted Price',
+                        data: [
+                            {{ predictions['Linear Regression'] }},
+                            {{ predictions['Random Forest'] }},
+                            {{ predictions['Decision Tree'] }},
+                            {{ predictions['ARIMA'] }}
+                        ],
+                        borderColor: '#ffffff',
+                        backgroundColor: 'rgba(255,255,255,0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#ffdd59',
+                        pointBorderColor: '#fff',
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255,255,255,0.2)' }
+                        },
+                        y: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255,255,255,0.2)' }
+                        }
+                    }
+                }
+            });
+    
+            const performance = {{ performance | tojson }};
+            let bestModel = null;
+            let bestScore = -Infinity;
+    
+            for (const [model, score] of Object.entries(performance)) {
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestModel = model;
+                }
+            }
+    
+            let recommendationElem = document.getElementById("recommendation");
+            if (!recommendationElem) {
+                recommendationElem = document.createElement("p");
+                recommendationElem.id = "recommendation";
+                recommendationElem.style.textAlign = "center";
+                recommendationElem.style.marginTop = "15px";
+                recommendationElem.style.fontSize = "16px";
+                document.getElementById("chartContainer").appendChild(recommendationElem);
+            }
+    
+            recommendationElem.innerHTML =
+                bestModel
+                ? `✅ Based on R², <b>${bestModel}</b> is the best performing model (R² = ${bestScore.toFixed(4)}).`
+                : "ℹ️ No performance data available to recommend a model.";
+        }
+    </script>
+    
+</body>
+</html>

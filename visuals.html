@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ ticker }} - Stock Visualizations</title>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: linear-gradient(135deg, #3a1c71, #1f2e68, #36302d); 
+           color: #f8bbd0; }
+    h1, h2 { color: #f48fb1; }
+    .chart-container { width: 80%; margin: 30px auto; }
+    .insight-box { background: #1e1e1e; padding: 15px; margin: 20px 0; border-radius: 8px; box-shadow: 0px 2px 6px rgba(255,192,203,0.2);}
+    select { background: #212121; color: #f48fb1; border: 1px solid #f48fb1; padding: 8px 12px; border-radius: 6px; margin-bottom: 20px; font-size: 16px;}
+  </style>
+</head>
+<body>
+  <h1>📊 Stock Analysis for {{ ticker }}</h1>
+
+  <!-- Dropdown -->
+  <label for="tickerSelect">Choose Company:</label>
+  <select id="tickerSelect">
+      <optgroup label="US Tech Giants">
+        <option value="AAPL" {% if ticker == "AAPL" %}selected{% endif %}>Apple (AAPL)</option>
+        <option value="MSFT" {% if ticker == "MSFT" %}selected{% endif %}>Microsoft (MSFT)</option>
+        <option value="GOOGL" {% if ticker == "GOOGL" %}selected{% endif %}>Google (GOOGL)</option>
+        <option value="AMZN" {% if ticker == "AMZN" %}selected{% endif %}>Amazon (AMZN)</option>
+        <option value="TSLA" {% if ticker == "TSLA" %}selected{% endif %}>Tesla (TSLA)</option>
+        <option value="META" {% if ticker == "META" %}selected{% endif %}>Meta (Facebook) (META)</option>
+        <option value="NFLX" {% if ticker == "NFLX" %}selected{% endif %}>Netflix (NFLX)</option>
+        <option value="NVDA" {% if ticker == "NVDA" %}selected{% endif %}>NVIDIA (NVDA)</option>
+      </optgroup>
+    
+      <optgroup label="US Blue Chips">
+        <option value="JPM" {% if ticker == "JPM" %}selected{% endif %}>JPMorgan Chase (JPM)</option>
+        <option value="BAC" {% if ticker == "BAC" %}selected{% endif %}>Bank of America (BAC)</option>
+        <option value="GS" {% if ticker == "GS" %}selected{% endif %}>Goldman Sachs (GS)</option>
+        <option value="DIS" {% if ticker == "DIS" %}selected{% endif %}>Disney (DIS)</option>
+        <option value="KO" {% if ticker == "KO" %}selected{% endif %}>Coca-Cola (KO)</option>
+        <option value="PEP" {% if ticker == "PEP" %}selected{% endif %}>PepsiCo (PEP)</option>
+        <option value="MCD" {% if ticker == "MCD" %}selected{% endif %}>McDonald's (MCD)</option>
+        <option value="WMT" {% if ticker == "WMT" %}selected{% endif %}>Walmart (WMT)</option>
+      </optgroup>
+    
+      <optgroup label="UK Stocks">
+        <option value="VOD.L" {% if ticker == "VOD.L" %}selected{% endif %}>Vodafone Group (VOD.L)</option>
+        <option value="HSBA.L" {% if ticker == "HSBA.L" %}selected{% endif %}>HSBC Holdings (HSBA.L)</option>
+        <option value="BP.L" {% if ticker == "BP.L" %}selected{% endif %}>BP Plc (BP.L)</option>
+        <option value="ULVR.L" {% if ticker == "ULVR.L" %}selected{% endif %}>Unilever (ULVR.L)</option>
+      </optgroup>
+    
+      <optgroup label="Indian Stocks (NSE)">
+        <option value="RELIANCE.NS" {% if ticker == "RELIANCE.NS" %}selected{% endif %}>Reliance Industries (RELIANCE.NS)</option>
+        <option value="TCS.NS" {% if ticker == "TCS.NS" %}selected{% endif %}>Tata Consultancy Services (TCS.NS)</option>
+        <option value="INFY.NS" {% if ticker == "INFY.NS" %}selected{% endif %}>Infosys (INFY.NS)</option>
+        <option value="WIPRO.NS" {% if ticker == "WIPRO.NS" %}selected{% endif %}>Wipro (WIPRO.NS)</option>
+      </optgroup>
+    
+    </select>
+    
+
+  <div class="insight-box">
+    <h2>Insights</h2>
+    <p>✔ Line chart shows stock closing prices.</p>
+    <p>✔ Bar chart shows trading volumes.</p>
+    <p>✔ Histogram shows distribution of closing prices.</p>
+    <p>✔ Pie chart shows average Open, High, Low, Close distribution.</p>
+  </div>
+
+  <div class="chart-container">
+    <h2>📈 Closing Price Trend</h2>
+    <canvas id="lineChart"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h2>📊 Trading Volume</h2>
+    <canvas id="barChart"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h2>📉 Price Distribution Histogram</h2>
+    <canvas id="histChart"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <h2>📉 Price Distribution (Average)</h2>
+    <canvas id="pieChart"></canvas>
+  </div>
+
+  <script>
+    // Stock data passed from backend
+    const stockData = {{ data|safe }};
+
+    // Dropdown redirect
+    document.getElementById("tickerSelect").addEventListener("change", function() {
+      const selectedTicker = this.value;
+      window.location.href = `/visuals?ticker=${selectedTicker}`;
+    });
+
+    // Line Chart (Closing Price)
+    new Chart(document.getElementById('lineChart'), {
+      type: 'line',
+      data: {
+        labels: stockData.dates,
+        datasets: [{
+          label: 'Closing Price',
+          data: stockData.close,
+          borderColor: '#f48fb1',
+          backgroundColor: 'rgba(244,143,177,0.2)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: "#f8bbd0" } } },
+        scales: { x: { ticks: { color: "#f8bbd0" } }, y: { ticks: { color: "#f8bbd0" } } }
+      }
+    });
+
+    // Bar Chart (Volume)
+    new Chart(document.getElementById('barChart'), {
+      type: 'bar',
+      data: {
+        labels: stockData.dates,
+        datasets: [{
+          label: 'Volume',
+          data: stockData.volume,
+          backgroundColor: '#f06292'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: "#f8bbd0" } } },
+        scales: { x: { ticks: { color: "#f8bbd0" } }, y: { ticks: { color: "#f8bbd0" } } }
+      }
+    });
+
+    // Histogram (Distribution of Closing Prices)
+    function makeHistogram(data, bins = 10) {
+      const min = Math.min(...data);
+      const max = Math.max(...data);
+      const step = (max - min) / bins;
+      let counts = new Array(bins).fill(0);
+      data.forEach(v => {
+        let idx = Math.min(Math.floor((v - min) / step), bins - 1);
+        counts[idx]++;
+      });
+      let labels = Array.from({length: bins}, (_, i) =>
+        `${(min + i*step).toFixed(2)} - ${(min + (i+1)*step).toFixed(2)}`
+      );
+      return { labels, counts };
+    }
+
+    const hist = makeHistogram(stockData.close, 12);
+
+    new Chart(document.getElementById('histChart'), {
+      type: 'bar',
+      data: {
+        labels: hist.labels,
+        datasets: [{
+          label: 'Frequency',
+          data: hist.counts,
+          backgroundColor: 'rgba(255,105,180,0.7)'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: "#f8bbd0" } } },
+        scales: {
+          x: { ticks: { color: "#f8bbd0", maxRotation: 60, minRotation: 30 } },
+          y: { ticks: { color: "#f8bbd0" } }
+        }
+      }
+    });
+
+    // Pie Chart (Average OHLC)
+    const avgOpen = stockData.open.reduce((a,b)=>a+b,0)/stockData.open.length;
+    const avgHigh = stockData.high.reduce((a,b)=>a+b,0)/stockData.high.length;
+    const avgLow  = stockData.low.reduce((a,b)=>a+b,0)/stockData.low.length;
+    const avgClose= stockData.close.reduce((a,b)=>a+b,0)/stockData.close.length;
+
+    new Chart(document.getElementById('pieChart'), {
+      type: 'pie',
+      data: {
+        labels: ["Open", "High", "Low", "Close"],
+        datasets: [{
+          data: [avgOpen, avgHigh, avgLow, avgClose],
+          backgroundColor: ["#f06292","#ba68c8","#4db6ac","#ffb74d"]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: "#f8bbd0" } } }
+      }
+    });
+  </script>
+</body>
+</html>

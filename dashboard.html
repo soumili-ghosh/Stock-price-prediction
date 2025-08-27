@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stock Market Trend Forecaster</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background:linear-gradient(135deg, #3a1c71, #1f2e68, #36302d); 
+      color: #f5f5f5;
+      overflow-x: hidden;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: rgba(15, 15, 25, 0.95);
+      backdrop-filter: blur(12px);
+      padding: 18px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 64, 180, 0.5);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar .logo {
+      font-size: 28px;
+      font-weight: 800;
+      color: #ff2fa4;
+      text-decoration: none;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: 0.3s;
+    }
+    .navbar .logo:hover {
+      color: #ff61c2;
+      text-shadow: 0 0 20px #ff2fa4;
+    }
+
+    .navbar .menu {
+      display: flex;
+      gap: 35px;
+    }
+
+    .navbar .menu a {
+      text-decoration: none;
+      color: #ddd;
+      font-weight: 500;
+      font-size: 15px;
+      transition: 0.3s;
+      position: relative;
+    }
+    .navbar .menu a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -5px;
+      width: 0%;
+      height: 2px;
+      background: linear-gradient(90deg, #ff2fa4, #ff61c2);
+      transition: width 0.3s;
+    }
+    .navbar .menu a:hover {
+      color: #ff2fa4;
+    }
+    .navbar .menu a:hover::after {
+      width: 100%;
+    }
+
+    .navbar .auth button {
+      padding: 10px 22px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 14px;
+    }
+    .navbar .auth .login {
+      background: transparent;
+      color: #ff2fa4;
+      border: 1px solid #ff2fa4;
+    }
+    .navbar .auth .login:hover {
+      background: #ff2fa4;
+      color: #fff;
+      box-shadow: 0 0 15px #ff2fa4;
+    }
+    .navbar .auth .register {
+      background: linear-gradient(135deg, #ff2fa4, #ff61c2);
+      color: white;
+      margin-left: 12px;
+      box-shadow: 0 0 12px rgba(255,64,180,0.7);
+    }
+    .navbar .auth .register:hover {
+      background: linear-gradient(135deg, #ff61c2, #ff95d3);
+      box-shadow: 0 0 25px #ff61c2;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, rgba(10,10,15,0.95), rgba(20,15,25,0.95)),
+                  url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
+      background-size: cover;
+      background-position: center;
+      padding: 160px 20px;
+      text-align: center;
+      color: #fff;
+      position: relative;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at center, rgba(255,47,164,0.2), transparent);
+    }
+
+    .hero h1 {
+      font-size: 62px;
+      font-weight: 900;
+      margin-bottom: 30px;
+      letter-spacing: -1px;
+      color: #ff2fa4;
+      text-shadow: 0 0 30px rgba(255, 47, 164, 0.8);
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero p {
+      font-size: 20px;
+      max-width: 800px;
+      margin: 0 auto 70px;
+      line-height: 1.9;
+      color: #ffe3f2;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Features */
+    .features {
+      display: flex;
+      justify-content: center;
+      gap: 80px;
+      flex-wrap: wrap;
+      margin-top: 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .feature-box {
+      background: linear-gradient(160deg, #3e3e3e, #0d0d15);
+      padding: 35px 40px;
+      border-radius: 18px;
+      width: 250px;
+      text-align: center;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      border: 1px solid rgba(255, 47, 164, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-box:hover {
+      transform: translateY(-14px) scale(1.07);
+      box-shadow: 0 18px 45px rgba(255, 47, 164, 0.5);
+    }
+
+    .feature-icon {
+      font-size: 50px;
+      margin-bottom: 18px;
+      background: linear-gradient(135deg, #ff2fa4, #ff95d3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .feature-text {
+      font-size: 19px;
+      font-weight: 600;
+      color: #fff;
+      position: relative;
+      z-index: 1;
+    }
+    .feature-text a {
+      text-decoration: none;
+      color: #ff61c2;
+      transition: 0.3s;
+    }
+    .feature-text a:hover {
+      color: #ff95d3;
+    }
+
+    /* About Section */
+    .about {
+      background: #0f0f18;
+      padding: 110px 20px;
+      text-align: center;
+      border-top: 1px solid rgba(255,47,164,0.3);
+    }
+
+    .about h2 {
+      font-size: 42px;
+      color: #ff2fa4;
+      margin-bottom: 30px;
+      font-weight: 800;
+      text-shadow: 0 0 20px rgba(255,47,164,0.7);
+    }
+
+    .about p {
+      font-size: 20px;
+      max-width: 950px;
+      margin: 0 auto;
+      color: #e0e0e0;
+      line-height: 1.9;
+    }
+  </style>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <script src="https://kit.fontawesome.com/7f5d8f19dc.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="#" class="logo">TrendSetter</a>
+    <div class="auth">
+      <button class="login"><a href="/login">Login</a></button>
+      <button class="register"><a href="/register">Register</a></button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1> Stock Market Trend Forecaster</h1>
+    <p>
+      A futuristic AI-driven platform blending predictive modeling with data visualization  
+      to help investors capture opportunities and forecast stock trends with stunning accuracy.
+    </p>
+
+    <div class="features">
+      <div class="feature-box">
+        <span class="feature-icon"><i class="fas fa-chart-line"></i></span>
+        <div class="feature-text"><a href="/visuals">Time-Series Analysis</a></div>
+      </div>
+      <div class="feature-box">
+        <span class="feature-icon"><i class="fas fa-wave-square"></i></span>
+        <div class="feature-text"><a href="/index">Trend Prediction</a></div>
+      </div>
+      <div class="feature-box">
+        <span class="feature-icon"><i class="fas fa-th-large"></i></span>
+        <div class="feature-text"><a href="/volatility">Volatility Analysis</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about">
+    <h2>Why Choose TrendForecaster?</h2>
+    <p>
+      TrendForecaster brings together a striking visual experience and powerful market intelligence. With AI-driven insights and expert analysis at your fingertips, you’ll always be ready to anticipate market moves, minimize risks, and trade with confidence.
+    </p>
+  </section>
+
+</body>
+</html>

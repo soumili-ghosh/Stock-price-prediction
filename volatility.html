@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>📊 Stock Volatility Analysis</title>
+    <style>
+        body { 
+          background: linear-gradient(135deg, #3a1c71, #1f2e68, #36302d); 
+            
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            text-align: center; 
+            margin: 0; 
+            padding: 0;
+        }
+        .card { 
+            margin: 50px auto; 
+            padding: 30px; 
+            width: 60%; 
+            border-radius: 15px; 
+            background: rgb(56, 52, 52); 
+            box-shadow: 0px 0px 20px rgba(158, 62, 138, 0.7); 
+        }
+        h1 { 
+            color: #ff00cc; 
+            text-shadow: 0px 0px 15px rgba(255,0,204,0.9);
+            margin-bottom: 20px;
+        }
+        label { 
+            font-size: 18px; 
+            margin-right: 10px; 
+        }
+        select, button { 
+            padding: 10px 18px; 
+            margin: 10px; 
+            border-radius: 8px; 
+            border: none; 
+            font-size: 15px;
+        }
+        select { 
+            background: #1a1a1a; 
+            color: #00ffcc; 
+            border: 1px solid #ff00cc; 
+        }
+        button { 
+            background: #ff00cc; 
+            color: white; 
+            font-weight: bold;
+            cursor: pointer; 
+            transition: 0.3s ease;
+            box-shadow: 0px 0px 15px rgba(255,0,204,0.7);
+        }
+        button:hover { 
+            background: #e600ac; 
+            transform: scale(1.05); 
+            box-shadow: 0px 0px 25px rgba(255,0,204,0.9);
+        }
+        .stats { 
+            margin-top: 25px; 
+            font-size: 18px; 
+            color: yellow; 
+            text-align: left; 
+            padding: 15px; 
+            border-radius: 10px; 
+            background: #1a1a1a; 
+            box-shadow: 0px 0px 15px rgba(0,255,204,0.6);
+        }
+        .stats p { margin: 8px 0; }
+        .meaning { 
+            margin-top: 30px; 
+            font-size: 16px; 
+            color: #00ffcc; 
+            text-align: left; 
+            padding: 20px; 
+            border-radius: 12px; 
+            background: #1a1a1a; 
+            box-shadow: 0px 0px 15px rgba(0,255,204,0.6);
+        }
+        .meaning h3 { 
+            color: #ff00cc; 
+            margin-bottom: 10px; 
+        }
+        ul { 
+            text-align: left; 
+            margin-top: 10px;
+        }
+        li { margin: 6px 0; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>📊 Stock Volatility Analysis</h1>
+        <form method="POST">
+            <label>Choose a Stock:</label>
+            <select name="ticker" id="ticker" class="form-control">
+                <optgroup label="US Tech Giants">
+                    <option value="AAPL" {% if ticker == "AAPL" %}selected{% endif %}>Apple (AAPL)</option>
+                    <option value="MSFT" {% if ticker == "MSFT" %}selected{% endif %}>Microsoft (MSFT)</option>
+                    <option value="GOOGL" {% if ticker == "GOOGL" %}selected{% endif %}>Google (GOOGL)</option>
+                    <option value="AMZN" {% if ticker == "AMZN" %}selected{% endif %}>Amazon (AMZN)</option>
+                    <option value="TSLA" {% if ticker == "TSLA" %}selected{% endif %}>Tesla (TSLA)</option>
+                    <option value="META" {% if ticker == "META" %}selected{% endif %}>Meta (META)</option>
+                    <option value="NFLX" {% if ticker == "NFLX" %}selected{% endif %}>Netflix (NFLX)</option>
+                    <option value="NVDA" {% if ticker == "NVDA" %}selected{% endif %}>NVIDIA (NVDA)</option>
+                </optgroup>
+                <optgroup label="US Blue Chips">
+                    <option value="JPM" {% if ticker == "JPM" %}selected{% endif %}>JPMorgan Chase (JPM)</option>
+                    <option value="BAC" {% if ticker == "BAC" %}selected{% endif %}>Bank of America (BAC)</option>
+                    <option value="GS" {% if ticker == "GS" %}selected{% endif %}>Goldman Sachs (GS)</option>
+                    <option value="DIS" {% if ticker == "DIS" %}selected{% endif %}>Disney (DIS)</option>
+                    <option value="KO" {% if ticker == "KO" %}selected{% endif %}>Coca-Cola (KO)</option>
+                    <option value="PEP" {% if ticker == "PEP" %}selected{% endif %}>PepsiCo (PEP)</option>
+                    <option value="MCD" {% if ticker == "MCD" %}selected{% endif %}>McDonald's (MCD)</option>
+                    <option value="WMT" {% if ticker == "WMT" %}selected{% endif %}>Walmart (WMT)</option>
+                </optgroup>
+                <optgroup label="UK Stocks">
+                    <option value="VOD.L" {% if ticker == "VOD.L" %}selected{% endif %}>Vodafone Group (VOD.L)</option>
+                    <option value="HSBA.L" {% if ticker == "HSBA.L" %}selected{% endif %}>HSBC Holdings (HSBA.L)</option>
+                    <option value="BP.L" {% if ticker == "BP.L" %}selected{% endif %}>BP Plc (BP.L)</option>
+                    <option value="ULVR.L" {% if ticker == "ULVR.L" %}selected{% endif %}>Unilever (ULVR.L)</option>
+                </optgroup>
+                <optgroup label="Indian Stocks (NSE)">
+                    <option value="RELIANCE.NS" {% if ticker == "RELIANCE.NS" %}selected{% endif %}>Reliance Industries (RELIANCE.NS)</option>
+                    <option value="TCS.NS" {% if ticker == "TCS.NS" %}selected{% endif %}>Tata Consultancy Services (TCS.NS)</option>
+                    <option value="INFY.NS" {% if ticker == "INFY.NS" %}selected{% endif %}>Infosys (INFY.NS)</option>
+                    <option value="WIPRO.NS" {% if ticker == "WIPRO.NS" %}selected{% endif %}>Wipro (WIPRO.NS)</option>
+                </optgroup>
+            </select>
+            <button type="submit">Analyze</button>
+        </form>
+
+        {% if data %}
+        <div class="stats">
+            <p><b>Mean Volatility:</b> {{data.mean_volatility}}</p>
+            <p><b>Max Volatility:</b> {{data.max_volatility}}</p>
+            <p><b>Min Volatility:</b> {{data.min_volatility}}</p>
+        </div>
+
+        <div class="meaning">
+            <h3>📖 What does this mean?</h3>
+            <p><b>Volatility</b> measures how much a stock's price moves up and down over time.</p>
+            <ul>
+                <li><b>High Volatility</b> → Bigger price swings, higher risk, but also higher potential rewards.</li>
+                <li><b>Low Volatility</b> → Stable price, lower risk, but fewer big gains.</li>
+                <li><b>Mean Volatility</b> → The stock’s average risk level over the selected time period.</li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <style>
+        body {
+            background-color: #111;
+            color: #ff66b2;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #1a1a1a;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px #ff66b2;
+            width: 350px;
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 25px;
+            color: #ff66b2;
+        }
+        input[type="email"], input[type="password"] {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ff66b2;
+            border-radius: 8px;
+            background-color: #222;
+            color: #ff66b2;
+        }
+        button {
+            width: 95%;
+            padding: 12px;
+            margin-top: 15px;
+            background-color: #ff66b2;
+            color: #111;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #ff3399;
+            cursor: pointer;
+        }
+        .link {
+            margin-top: 15px;
+        }
+        .link a {
+            color: #ff66b2;
+            text-decoration: none;
+        }
+        .flash {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        .flash-success { background-color: #ff66b2; color: #111; }
+        .flash-danger { background-color: #ff0066; color: #fff; }
+        .flash-info { background-color: #ff33cc; color: #111; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST">
+            <input type="email" name="email" placeholder="Email" required><br>
+            <input type="password" name="password" placeholder="Password" required><br>
+            <button type="submit">Login</button>
+        </form>
+        <div class="link">
+            Don't have an account? <a href="{{ url_for('register') }}">Register</a>
+        </div>
+    </div>
+</body>
+</html>
