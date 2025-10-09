@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Stock Assistant</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(135deg, #3a1c71, #1f2e68, #36302d);
+      color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background: #2c3e50;
+      color: #00ff99;
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 0px 0px 8px rgba(0,255,153,0.7);
+    }
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: rgb(45, 45, 45);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0px 0px 15px rgba(0,255,153,0.5);
+    }
+    h2 {
+      border-bottom: 2px solid #00ff99;
+      padding-bottom: 8px;
+      margin-bottom: 15px;
+      color: #00ff99;
+      text-shadow: 0px 0px 6px rgba(0,255,153,0.6);
+    }
+    form {
+      margin-bottom: 25px;
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #a3ffce;
+    }
+    select, input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #00cc99;
+      background: #1a1a1a;
+      color: #b3ffd9;
+      font-size: 14px;
+    }
+    button {
+      background: #033b2d;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 15px;
+      font-weight: bold;
+      transition: 0.3s ease;
+      box-shadow: 0px 0px 10px rgba(0,255,153,0.5);
+    }
+    button:hover {
+      background: #009966;
+      transform: scale(1.05);
+      box-shadow: 0px 0px 18px rgba(0,255,153,0.7);
+    }
+    pre, ul {
+      background: #1f1f1f;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      box-shadow: 0px 0px 12px rgba(0,255,153,0.4);
+    }
+    li {
+      margin: 6px 0;
+    }
+    canvas {
+      margin-top: 20px;
+      border-radius: 12px;
+      background: #1a1a1a;
+      box-shadow: 0px 0px 15px rgba(0,255,153,0.3);
+    }
+  </style>
+  
+</head>
+<body>
+  <header>AI Stock Assistant</header>
+  <div class="container">
+    <form method="POST">
+      <label for="model">Select AI Model:</label>
+      <select name="model" required>
+        {% for m in models %}
+          <option value="{{m}}">{{m}}</option>
+        {% endfor %}
+      </select>
+
+      <label for="ticker">Select Stock:</label>
+      <select name="ticker" required>
+        {% for k,v in stocks.items() %}
+          <option value="{{k}}">{{v}} ({{k}})</option>
+        {% endfor %}
+      </select>
+
+      <label for="forecast_date">Select Forecast Date:</label>
+      <input type="date" name="forecast_date" required>
+
+      <button type="submit">Analyze</button>
+    </form>
+
+    {% if ai_response %}
+      <h2>AI Assistant Response</h2>
+      <pre>{{ ai_response }}</pre>
+    {% endif %}
+
+    {% if prediction %}
+      <h2>Predictions</h2>
+      <ul>
+        <li><b>Last Closing Price ({{last_close_date}}):</b> {{prediction.last_price}}</li>
+        {% for k,v in prediction.items() %}
+          {% if k != 'last_price' %}
+            <li><b>{{k}}:</b> {{v}}</li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if analysis %}
+      <h2>Technical Analysis</h2>
+      <ul>
+        <li><b>Support:</b> {{analysis.support}}</li>
+        <li><b>Resistance:</b> {{analysis.resistance}}</li>
+        <li><b>Stance:</b> {{analysis.stance}}</li>
+        <li><b>Entry:</b> {{analysis.entry}}</li>
+        <li><b>Stoploss:</b> {{analysis.stoploss}}</li>
+        <li><b>Target:</b> {{analysis.target}}</li>
+      </ul>
+    {% endif %}
+
+
+    {% if chart_data %}
+      <h2>Stock Trend (6 months)</h2>
+      <canvas id="stockChart" width="800" height="400"></canvas>
+      <script>
+        const ctx = document.getElementById('stockChart');
+        const data = {{chart_data | safe}};
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.dates,
+            datasets: [{
+              label: 'Close Price',
+              data: data.close,
+              borderColor: '#ff00cc',
+              backgroundColor: 'rgba(255,0,204,0.2)',
+              fill: true,
+              tension: 0.3
+            }]
+          },
+          options: {
+            plugins: { legend: { labels: { color: '#00ffcc' } } },
+            scales: {
+              x: { ticks: { color: '#00ffcc' }, grid: { color: 'rgba(255,0,204,0.2)' } },
+              y: { ticks: { color: '#00ffcc' }, grid: { color: 'rgba(255,0,204,0.2)' } }
+            }
+          }
+        });
+      </script>
+    {% endif %}
+
+  
+  
+  </div>
+
+
+<style>
+  /* Floating Button */
+  #chatButton {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    background: #00ff99;
+    color: #000;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0,255,153,0.5);
+    z-index: 9999;
+  }
+
+  /* Chat Window */
+  #chatWindow {
+    position: fixed;
+    bottom: 100px;
+    right: 25px;
+    width: 350px;
+    max-height: 500px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,255,153,0.5);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 9998;
+  }
+
+  #chatHeader {
+    background: #2c3e50;
+    color: #00ff99;
+    padding: 10px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  #closeChat {
+    cursor: pointer;
+    color: #ff5555;
+  }
+
+  #chatBody {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    flex: 1;
+    gap: 6px;
+  }
+
+  #chatMessages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    border-radius: 8px;
+    background: #121212;
+    color: #fff;
+    font-size: 14px;
+  }
+
+  #chatMessages .botMsg {
+    background: #00ff99;
+    color: #000;
+    padding: 6px 8px;
+    border-radius: 8px;
+    margin: 4px 0;
+    align-self: flex-start;
+  }
+
+  #chatMessages .userMsg {
+    background: #033b2d;
+    color: #fff;
+    padding: 6px 8px;
+    border-radius: 8px;
+    margin: 4px 0;
+    align-self: flex-end;
+  }
+
+  #chatInput {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #00cc99;
+    background: #1a1a1a;
+    color: #b3ffd9;
+    flex: none;
+    width: calc(100% - 60px);
+  }
+
+  #sendBtn {
+    padding: 8px;
+    margin-left: 4px;
+    border-radius: 8px;
+    background: #009966;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  #sendBtn:hover {
+    background: #00ff99;
+    color: black;
+  }
+
+  #chatInput, #sendBtn {
+    display: inline-block;
+  }
+</style>
+
+
+</body>
+</html>
